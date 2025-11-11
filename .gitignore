@@ -1,0 +1,82 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables
+.env
+.env.test
+.env.local
+.env.development.local
+.env.production.local
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+bower_components
+
+# Build directories
+dist/
+build/
+.cache/
+.next/
+.nuxt/
+out/
+coverage/
+.tmp/
+temp/
+
+# Uploads / user files
+uploads/
+public/uploads/
+*.pdf
+
+# Database / local data
+*.sqlite
+*.db
+data/
+dump.rdb
+
+# VSCode / IDE settings
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# OS generated files
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# TypeScript build files
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Optional eslint cache
+.eslintcache
+
+# Yarn v2+
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
+# dotenvx encryption keys (if used)
+.env.keys
