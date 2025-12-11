@@ -1,4 +1,3 @@
-
 // services/email.service.js
 require("dotenv").config();
 const nodemailer = require("nodemailer");
@@ -6,25 +5,13 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT || "465"),
-  secure: true, // Hostinger SMTP must use true for port 465
+  secure: parseInt(process.env.SMTP_PORT) === 465, // FIXED
   auth: {
-    user: process.env.SMTP_USER.trim(),
-    pass: process.env.SMTP_PASS.trim(),
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
   },
-
-  // IMPORTANT FIXES FOR RENDER
-  pool: true,
-  maxConnections: 3,
-  maxMessages: 50,
-  rateLimit: 5,
-
-  connectionTimeout: 100000, // 30s
-  greetingTimeout: 100000,
-  socketTimeout: 100000,
-
   tls: {
-    minVersion: "TLSv1.2",
-    rejectUnauthorized: true, // FIXED: Hostinger requires true
+    rejectUnauthorized: false, 
   },
 });
 
@@ -33,29 +20,24 @@ const transporter = nodemailer.createTransport({
  */
 async function sendEmail({ to, subject, html, attachment, filename }) {
   try {
-    let attachments = [];
-
-    // Hostinger requires base64 encoding for buffer attachments (important fix)
-    if (attachment) {
-      attachments.push({
-        filename: filename || "attachment.pdf",
-        content: Buffer.from(attachment).toString("base64"),
-        encoding: "base64",
-        contentType: "application/pdf",
-      });
-    }
-
     const mailOptions = {
       from: `"${process.env.COMPANY_NAME || "Stock Matra Pvt Ltd."}" <${process.env.SMTP_USER}>`,
       to,
       subject,
       html,
       replyTo: process.env.COMPANY_EMAIL || process.env.SMTP_USER,
-      attachments,
+      attachments: attachment
+        ? [
+            {
+              filename: filename || "invoice.pdf",
+              content: attachment,
+              contentType: "application/pdf",
+            },
+          ]
+        : [],
     };
 
     const info = await transporter.sendMail(mailOptions);
-
     console.log(`✅ Email sent successfully to ${to}: ${info.messageId}`);
     return info;
   } catch (err) {
@@ -65,65 +47,6 @@ async function sendEmail({ to, subject, html, attachment, filename }) {
 }
 
 module.exports = { sendEmail, transporter };
-
-
-
-
-
-
-
-
-
-
-// // services/email.service.js
-// require("dotenv").config();
-// const nodemailer = require("nodemailer");
-
-// const transporter = nodemailer.createTransport({
-//   host: process.env.SMTP_HOST,
-//   port: parseInt(process.env.SMTP_PORT || "465"),
-//   secure: parseInt(process.env.SMTP_PORT) === 465, // FIXED
-//   auth: {
-//     user: process.env.SMTP_USER,
-//     pass: process.env.SMTP_PASS,
-//   },
-//   tls: {
-//     rejectUnauthorized: false, 
-//   },
-// });
-
-// /**
-//  * Send email via Hostinger SMTP
-//  */
-// async function sendEmail({ to, subject, html, attachment, filename }) {
-//   try {
-//     const mailOptions = {
-//       from: `"${process.env.COMPANY_NAME || "Stock Matra Pvt Ltd."}" <${process.env.SMTP_USER}>`,
-//       to,
-//       subject,
-//       html,
-//       replyTo: process.env.COMPANY_EMAIL || process.env.SMTP_USER,
-//       attachments: attachment
-//         ? [
-//             {
-//               filename: filename || "invoice.pdf",
-//               content: attachment,
-//               contentType: "application/pdf",
-//             },
-//           ]
-//         : [],
-//     };
-
-//     const info = await transporter.sendMail(mailOptions);
-//     console.log(`✅ Email sent successfully to ${to}: ${info.messageId}`);
-//     return info;
-//   } catch (err) {
-//     console.error("❌ Email send failed:", err);
-//     throw err;
-//   }
-// }
-
-// module.exports = { sendEmail, transporter };
 
 
 
