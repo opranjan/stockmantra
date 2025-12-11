@@ -5,7 +5,7 @@ function welcomeEmailTemplate({ name, email, mobile, amount, startDate, endDate,
   const encodedMobile = encodeURIComponent(mobile);
 
   // The link includes all 3 params
-  const agreementUrl = `https://seagreen-shark-128640.hostingersite.com/agreement?name=${encodedName}&email=${encodedEmail}&mobile=${encodedMobile}`;
+  const agreementUrl = `http://72.60.99.84/agreement?name=${encodedName}&email=${encodedEmail}&mobile=${encodedMobile}`;
 
   return `
   <div style="font-family: Arial, sans-serif; color: #333; line-height:1.6; max-width:700px; margin:auto; border:1px solid #ddd; border-radius:6px; overflow:hidden;">
