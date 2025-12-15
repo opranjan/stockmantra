@@ -83,6 +83,7 @@ async function submit(req, res) {
     // Send via Hostinger SMTP
     await sendEmail({
       to: submission.email,
+      cc: process.env.EMAIL_CC,
       subject: "Welcome Onboard – Your Research Service Details & Disclosures",
       html: emailHtml,
       attachment: pdfBuffer,

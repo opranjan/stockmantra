@@ -34,6 +34,7 @@ const nodemailer = require("nodemailer");
     const info = await transporter.sendMail({
       from: `"Stock Matra Pvt Ltd." <${process.env.SMTP_USER}>`,
       to: process.env.SMTP_USER, // send to your own address
+      cc: process.env.SMTP_CC_EMAIL,
       subject: "✅ Test Email via Hostinger SMTP",
       text: "If you received this, SMTP works perfectly!",
     });

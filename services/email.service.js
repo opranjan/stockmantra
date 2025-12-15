@@ -18,11 +18,12 @@ const transporter = nodemailer.createTransport({
 /**
  * Send email via Hostinger SMTP
  */
-async function sendEmail({ to, subject, html, attachment, filename }) {
+async function sendEmail({ to,cc, subject, html, attachment, filename }) {
   try {
     const mailOptions = {
       from: `"${process.env.COMPANY_NAME || "Stock Matra Pvt Ltd."}" <${process.env.SMTP_USER}>`,
       to,
+      cc, 
       subject,
       html,
       replyTo: process.env.COMPANY_EMAIL || process.env.SMTP_USER,

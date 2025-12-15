@@ -36,7 +36,7 @@ function agreementEmailTemplate(submission) {
 
 async function sendAgreementEmail(req, res) {
   try {
-    const { email } = req.body;
+    const { email,ip } = req.body;
 
     if (!email) {
       return res.status(400).json({ ok: false, message: "Email is required." });
@@ -48,11 +48,12 @@ async function sendAgreementEmail(req, res) {
     }
 
     // Generate agreement PDF
-    const agreementBuffer = await generateUserAgreementBuffer(submission, req.ip);
+    const agreementBuffer = await generateUserAgreementBuffer(submission, ip);
 
     // Send email
     await sendEmail({
       to: submission.email,
+      cc: process.env.EMAIL_CC,
       subject: "Thank you for agreeing to our Terms – Stock Mantra",
       html: agreementEmailTemplate(submission),
       attachment: agreementBuffer,
