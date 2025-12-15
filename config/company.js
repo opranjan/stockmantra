@@ -12,7 +12,7 @@ const COMPANY = {
   },
 
   AGREEMENT: {
-    BASE_URL: "https://alstockmantra.in/agreement",
+    BASE_URL: "http://72.60.99.84/agreement",
   },
 };
 
