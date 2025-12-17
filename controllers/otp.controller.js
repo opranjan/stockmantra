@@ -37,7 +37,7 @@ exports.sendOtp = async (req, res) => {
           <p>This OTP is valid for <strong>5 minutes</strong>.</p>
           <p>If you didn’t request this, please ignore this email.</p>
           <br/>
-          <p>Warm regards,<br/>Stock Mantra Pvt Ltd</p>
+          <p>Warm regards,<br/>ALDERLEAF STOCKMANTRA Pvt Ltd</p>
         </div>
       `,
     };

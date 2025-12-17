@@ -191,9 +191,9 @@ async function generateInvoice(req, res) {
     // ===== FOOTER =====
     doc.rect(startX, y, pageWidth, 80).stroke();
     y += 4;
-    doc.font("Helvetica-Bold").text("Stock Matra Pvt Ltd.", startX + pad, y);
+    doc.font("Helvetica-Bold").text("ALDERLEAF STOCKMANTRA Pvt Ltd.", startX + pad, y);
     y += 14;
-    doc.font("Helvetica").text("SEBI Registration No. INH000015534", startX + pad, y);
+    doc.font("Helvetica").text("SEBI Registration No. INH000019099", startX + pad, y);
     y += 12;
     doc.text(
       "Email: support@stockmantra.com | Phone: +91-9049800505",

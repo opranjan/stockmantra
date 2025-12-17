@@ -31,10 +31,10 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
     // ================= HEADER (only first page) =================
     const headerHeight = 100;
     doc.rect(0, 0, doc.page.width, headerHeight).fill(blue);
-    doc.fill("#fff").font(bold).fontSize(14).text("Stock Mantra Pvt Ltd", leftMargin, 22);
+    doc.fill("#fff").font(bold).fontSize(14).text("ALDERLEAF STOCKMANTRA Pvt Ltd", leftMargin, 22);
     doc.font(regular).fontSize(10)
       .text("SEBI Registered Research Analyst", leftMargin, 40)
-      .text("Registration No. INH000015534", leftMargin, 52)
+      .text("Registration No. INH000019099", leftMargin, 52)
       .text("Compliance with SEBI (Research Analyst) Regulations, 2014", leftMargin, 64);
     doc.moveDown(3);
 
@@ -75,7 +75,7 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
     function addFooter() {
       const footerY = 780;
       doc.fontSize(9).fillColor(lightGray)
-        .text("Stock Mantra Pvt Ltd • support@stockmantra.com • +91-9049800505",
+        .text("Stock Mantra Pvt Ltd • support@alstockmantra.in • +91-7977117177",
           leftMargin, footerY - 25, { width, align: "center" });
       doc.text("Website: https://stockmantra.com/", leftMargin, footerY - 12, { width, align: "center" });
     }
@@ -84,7 +84,7 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
     heading("TERMS AND CONDITIONS:");
     doc.font(regular).fillColor(gray).fontSize(normal).text(
       "Parties to these Terms and Conditions:\n\n" +
-      "i. Research Analyst: Stock Mantra Pvt Ltd., a SEBI Registered Research Analyst (INH000015534), with its registered office at Renuka Shobha FI 604 Sno., Chinchwad, Pune, Maharashtra.\n\n" +
+      "i. Research Analyst: ALDERLEAF STOCKMANTRA Pvt Ltd., a SEBI Registered Research Analyst (INH000019099), with its registered office at Renuka Shobha FI 604 Sno., Chinchwad, Pune, Maharashtra.\n\n" +
       "ii. Client: The individual subscribing to or availing research services provided by the Research Analyst, hereinafter referred to as the 'Client'.",
       leftMargin, doc.y, { width, align: "justify", lineGap: 2 }
     );
@@ -124,7 +124,7 @@ section(
   "ii. Recommendations in the research report do not provide any assurance of returns.\n" +
   "iii. There is no recourse to claim any losses incurred on investments made based on the recommendations in the research report.\n\n" +
   "Declaration by Research Analyst:\n" +
-  "1. It is duly registered with SEBI as an RA having Registration No.: INH000015534, Date of Registration: Mar 19, 2024.\n" +
+  "1. It is duly registered with SEBI as an RA having Registration No.: INH000019099, Date of Registration: Mar 19, 2024.\n" +
   "2. It has registration and qualifications required to render the services contemplated under the RA Regulations, and the same are valid and subsisting.\n" +
   "3. The services provided by the RA do not conflict with or violate any provision of law, rule, regulation, contract, or other instrument to which it is a party or to which any of its property is or may be subject.\n" +
   "4. The maximum fee that may be charged by the RA is Rs.1.51 lakhs per annum per family of clients.\n" +
@@ -177,8 +177,8 @@ section(
   "In the event of grievances related to non-receipt of the research report, missing content, or deficiencies in services, the Client may raise a grievance. The Research Analyst will ensure Redressal within 7 days of such complaint.\n\n" +
   "The client is required to follow the following procedure for any grievance:\n\n" +
   "Step 1: The client should first contact the RA at the contact details mentioned below:\n" +
-  "Contact No.: 9049800505\n" +
-  "Mail ID: support@stockmantra.com\n\n" +
+  "Contact No.: 7977117177\n" +
+  "Mail ID: support@alstockmantra.in\n\n" +
   "Step 2: In case, if the client is unsatisfied, he can lodge a complaint with the SEBI through SEBI's SCORES platform at www.scores.sebi.gov.in.\n" +
   "Step 3: The client can also consider to seek resolution through the Online Dispute Resolution (ODR) mechanism through SMART ODR Portal: https://smartodr.in.\n\n" +
   "DISCLAIMER: The client is strictly required to follow the procedure as mentioned above, otherwise the RA shall not be liable delay in resolution of the grievance.\n\n" +
@@ -209,8 +209,8 @@ section(
   "9. The SEBI registration, Enlistment with RAASB, and NISM certification do not guarantee the performance of the RA or assure any returns to the client.\n\n" +
   "10. For any grievances:\n" +
   "Step 1: The client should first contact the RA using the details mentioned herewith:\n" +
-  "Contact No.: 9049800505\n" +
-  "Mail ID: support@stockmantra.com\n" +
+  "Contact No.: 7977117177\n" +
+  "Mail ID: support@alstockmantra.in\n" +
   "Step 2: If the resolution is unsatisfactory, the client can also lodge grievances through SEBI's SCORES platform at www.scores.sebi.gov.in\n" +
   "Step 3: The client may also consider the Online Dispute Resolution (ODR) through the Smart ODR portal at https://smartodr.in\n\n" +
   "11. Clients are required to keep contact details, including email id and mobile number/s updated with the RA at all times.\n\n" +
@@ -260,7 +260,7 @@ section(
     const consentTop = doc.y + 20;
     doc.rect(leftMargin, consentTop, width, 200).stroke();
     doc.font(regular).fillColor(gray)
-      .text(`I, ${fullName}, acknowledge that I have read and agree to the complete Terms & Conditions set forth by Stock Mantra Pvt Ltd as of ${agreementDate}.`,
+      .text(`I, ${fullName}, acknowledge that I have read and agree to the complete Terms & Conditions set forth by ALDERLEAF STOCKMANTRA Pvt Ltd as of ${agreementDate}.`,
         leftMargin + 10, consentTop + 10, { width: width - 20, align: "justify" });
     doc.moveDown(1.2);
     doc.font(bold).text("SIGNATURE DETAILS:", leftMargin +10);
@@ -272,7 +272,7 @@ section(
 
     doc.moveDown(2);
     doc.fontSize(9).fillColor(lightGray)
-      .text("Note: This document contains the full Terms & Conditions. Visit https://stockmantra.com for more info.", leftMargin+10, doc.y, { width, align: "justify" });
+      .text("Note: This document contains the full Terms & Conditions. Visit https://alstockmantra.com for more info.", leftMargin+10, doc.y, { width, align: "justify" });
        doc.moveDown(4);
 
 
@@ -290,15 +290,15 @@ const footerWidth = width;
 doc.font("Helvetica-Bold")
   .fillColor("#1F3B77")
   .fontSize(12)
-  .text("Stock Mantra Pvt Ltd.", footerLeft + footerPadding, footerTop + footerPadding);
+  .text("ALDERLEAF STOCKMANTRA Pvt Ltd.", footerLeft + footerPadding, footerTop + footerPadding);
 
 doc.font("Helvetica")
   .fillColor("#333")
   .fontSize(10)
-  .text("SEBI Registration No. INH000015534", footerLeft + footerPadding, doc.y + 3)
-  .text("Email: support@stockmantra.com", footerLeft + footerPadding, doc.y + 3)
-  .text("Phone: +91-9049800505", footerLeft + footerPadding, doc.y + 3)
-  .text("Website: https://stockmantra.com/", footerLeft + footerPadding, doc.y + 3);
+  .text("SEBI Registration No. INH000019099", footerLeft + footerPadding, doc.y + 3)
+  .text("Email: support@alstockmantra.in", footerLeft + footerPadding, doc.y + 3)
+  .text("Phone: +91-7977117177", footerLeft + footerPadding, doc.y + 3)
+  .text("Website: https://alstockmantra.com/", footerLeft + footerPadding, doc.y + 3);
 
 doc.moveDown(2);
 doc.font("Helvetica-Bold")

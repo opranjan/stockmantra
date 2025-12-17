@@ -1,9 +1,9 @@
 const COMPANY = {
-  NAME: "Stock Mantra Pvt Ltd.",
-  WEBSITE: "https://stockmantra.com",
+  NAME: "ALDERLEAF STOCKMANTRA Pvt Ltd",
+  WEBSITE: "https://alstockmantra.in",
 
   SEBI: {
-    REG_NO: "INH000015534",
+    REG_NO: "INH000019099",
   },
 
     ADDRESS: {
@@ -15,12 +15,12 @@ const COMPANY = {
   },
 
   CONTACT: {
-    SUPPORT_EMAIL: "support@stockmantra.com",
-    REPORT_MOBILE: "+91-9049800505",
+    SUPPORT_EMAIL: "support@alstockmantra.in",
+    REPORT_MOBILE: "+91-7977117177",
   },
 
   AGREEMENT: {
-    BASE_URL: "http://alstockmantra.in/agreement",
+    BASE_URL: "https://alstockmantra.in/agreement",
   },
 };
 

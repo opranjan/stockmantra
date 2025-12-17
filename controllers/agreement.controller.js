@@ -10,7 +10,7 @@ function agreementEmailTemplate(submission) {
       <h2 style="color: #2c3e50; text-align:center;">Thank you for agreeing to our Terms</h2>
       <p style="font-size: 15px; color: #333;">Hi <strong>${submission.fullName}</strong>,</p>
       <p style="font-size: 15px; color: #333;">
-        We have recorded your acceptance of the <strong>Stock Mantra Pvt Ltd</strong> Terms & Conditions.
+        We have recorded your acceptance of the <strong>ALDERLEAF STOCKMANTRA Pvt.Ltd</strong> Terms & Conditions.
       </p>
       <h3 style="color:#2c3e50; border-bottom:1px solid #ddd; padding-bottom:5px;">Subscription Summary</h3>
       <p style="font-size: 14px; margin:6px 0;">Amount: <strong>₹${submission.amount.toFixed(2)}</strong></p>
@@ -25,8 +25,8 @@ function agreementEmailTemplate(submission) {
       </div>
 
       <p style="margin-top: 30px; font-size: 13px; color: #555;">
-        Stock Mantra Pvt Ltd<br>
-        support@stockmantra.com<br>
+        ALDERLEAF STOCKMANTRA Pvt.Ltd<br>
+        support@alstockmantra.in<br>
         +91-98765-43210
       </p>
     </div>
