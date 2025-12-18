@@ -23,6 +23,7 @@
     "nanoid": "^5.1.6",
     "nodemailer": "^7.0.10",
     "nodemon": "^3.1.11",
+    "number-to-words": "^1.2.4",
     "pdfkit": "^0.17.2"
   }
 }

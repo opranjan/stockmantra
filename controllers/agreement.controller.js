@@ -36,11 +36,33 @@ function agreementEmailTemplate(submission) {
 
 async function sendAgreementEmail(req, res) {
   try {
-    const { email,ip } = req.body;
+    const { email } = req.body;
 
     if (!email) {
       return res.status(400).json({ ok: false, message: "Email is required." });
     }
+
+
+
+    
+function getClientIp(req) {
+  let ip =
+    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.headers["x-real-ip"] ||
+    req.connection?.remoteAddress ||
+    req.socket?.remoteAddress ||
+    req.ip;
+
+  // Fix IPv6 localhost & IPv4-mapped IPv6
+  if (ip === "::1") ip = "127.0.0.1";
+  if (ip?.startsWith("::ffff:")) ip = ip.replace("::ffff:", "");
+
+  return ip;
+}
+
+
+    const clientIp = getClientIp(req);
+console.log("Client IP:", clientIp);
 
     const submission = await Submission.findOne({ email });
     if (!submission) {
@@ -48,7 +70,7 @@ async function sendAgreementEmail(req, res) {
     }
 
     // Generate agreement PDF
-    const agreementBuffer = await generateUserAgreementBuffer(submission, ip);
+    const agreementBuffer = await generateUserAgreementBuffer(submission, clientIp);
 
     // Send email
     await sendEmail({

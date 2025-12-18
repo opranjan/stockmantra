@@ -76,7 +76,7 @@ async function submit(req, res) {
       mobile: submission.mobile,   
       amount: submission.amount,
       startDate: formattedStart,
-      endDate: formattedEnd,
+      // endDate: formattedEnd,
       invoiceNo: `INV-${submission.txnId}`,
     });
 

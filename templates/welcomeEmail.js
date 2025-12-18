@@ -6,13 +6,15 @@ function welcomeEmailTemplate({
   mobile,
   amount,
   startDate,
-  endDate,
+  // endDate,
   invoiceNo,
 }) {
   // Encode the query parameters safely
   const encodedName = encodeURIComponent(name);
   const encodedEmail = encodeURIComponent(email);
   const encodedMobile = encodeURIComponent(mobile);
+
+   // <tr><td>End Date:</td><td><strong>${endDate}</strong></td></tr>
 
   // Agreement link with params
   const agreementUrl = `${COMPANY.AGREEMENT.BASE_URL}?name=${encodedName}&email=${encodedEmail}&mobile=${encodedMobile}`;
@@ -51,7 +53,7 @@ function welcomeEmailTemplate({
         <table style="width:100%; border-collapse:collapse; margin-top:10px;">
           <tr><td>Amount Paid:</td><td><strong>₹${amount.toFixed(2)}</strong></td></tr>
           <tr><td>Start Date:</td><td><strong>${startDate}</strong></td></tr>
-          <tr><td>End Date:</td><td><strong>${endDate}</strong></td></tr>
+         
           <tr><td>Invoice Number:</td><td><strong>${invoiceNo}</strong></td></tr>
         </table>
       </div>

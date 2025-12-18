@@ -8,6 +8,7 @@
 
 const PDFDocument = require("pdfkit");
 const COMPANY = require("../config/company");
+const numberToWords = require("number-to-words");
 
 function formatDate(date) {
   const d = new Date(date);
@@ -30,6 +31,32 @@ async function generateInvoiceBuffer(submission) {
     const invoiceNo = `INV-${submission.txnId}-${Date.now()}`;
     const invoiceDate = formatDate(new Date());
 
+
+
+    function amountInWordsINR(amount) {
+  const rupees = Math.floor(amount);
+  const paise = Math.round((amount - rupees) * 100);
+
+  let words = numberToWords.toWords(rupees)
+    .replace(/,/g, "")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  let result = `${words} Rupees`;
+
+  if (paise > 0) {
+    const paiseWords = numberToWords.toWords(paise)
+      .replace(/,/g, "")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+    result += ` And ${paiseWords} Paise`;
+  }
+
+  return result + " Only";
+}
+
+
+
+
+
     const doc = new PDFDocument({ size: "A4", margin: 50 });
     const chunks = [];
     doc.on("data", (chunk) => chunks.push(chunk));
@@ -43,7 +70,7 @@ async function generateInvoiceBuffer(submission) {
 
     // ===== HEADER =====
     doc.rect(startX, y, pageWidth, 28).stroke();
-    doc.font("Helvetica-Bold").fontSize(14).text("TAX INVOICE", 0, y + 8, {
+    doc.font("Helvetica-Bold").fontSize(14).text("ONBOARDING PERFORMA INVOICE", 0, y + 8, {
       align: "center",
     });
     y += 28;
@@ -105,7 +132,7 @@ async function generateInvoiceBuffer(submission) {
 
     doc.rect(startX, y, pageWidth, tableRowHeight).stroke();
     const rowValues = [
-      "2 days Research Services Subscription",
+      "Research Services Subscription",
       "998312",
       "1",
       baseAmount,
@@ -134,10 +161,10 @@ async function generateInvoiceBuffer(submission) {
     // ===== TAX SECTION =====
     const taxBoxW = pageWidth * 0.5;
     doc.rect(startX + taxBoxW, y, taxBoxW, 55).stroke();
-    doc.font("Helvetica-Bold").text("CGST", startX + taxBoxW + pad, y + 10);
-    doc.text(cgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 10, { width: 50, align: "right" });
-    doc.font("Helvetica-Bold").text("SGST", startX + taxBoxW + pad, y + 28);
-    doc.text(sgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 28, { width: 50, align: "right" });
+    // doc.font("Helvetica-Bold").text("CGST", startX + taxBoxW + pad, y + 10);
+    // doc.text(cgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 10, { width: 50, align: "right" });
+    // doc.font("Helvetica-Bold").text("SGST", startX + taxBoxW + pad, y + 28);
+    // doc.text(sgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 28, { width: 50, align: "right" });
 
     doc.rect(startX + taxBoxW, y + 55, taxBoxW, 28).stroke();
     doc.font("Helvetica-Bold").text("Total Amount", startX + taxBoxW + pad, y + 63);
@@ -147,7 +174,8 @@ async function generateInvoiceBuffer(submission) {
     // ===== AMOUNT IN WORDS =====
     doc.rect(startX, y, pageWidth, 28).stroke();
     doc.font("Helvetica-Bold").text("Total Amount in Words", startX + pad, y + 8);
-    doc.font("Helvetica").text("One Thousand Rupees only", startX + 190, y + 8);
+    const amountWords = amountInWordsINR(total);
+    doc.font("Helvetica").text(amountWords, startX + 190, y + 8);
     y += 28;
 
     // ===== IMPORTANT NOTES =====
