@@ -1,4 +1,4 @@
-const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+// const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
 const mobileRegex = /^[6-9][0-9]{9}$/;
 
 function validateBody(body) {
@@ -11,7 +11,8 @@ function validateBody(body) {
   req("fullName", (v) => typeof v === "string" && v.trim().length >= 2, "Full Name is required.");
   req("email", (v) => typeof v === "string" && /\S+@\S+\.\S+/.test(v), "Valid email required.");
   req("mobile", (v) => typeof v === "string" && mobileRegex.test(v), "Mobile must be 10 digits starting 6-9.");
-  req("pan", (v) => typeof v === "string" && panRegex.test(v), "PAN format invalid.");
+  // req("pan", (v) => typeof v === "string" && panRegex.test(v), "PAN format invalid.");
+   req("pan", "PAN is required.");
   req("dob", (v) => !!Date.parse(v), "Valid DOB is required.");
   req("amount", (v) => !isNaN(parseFloat(v)) && parseFloat(v) >= 0, "Amount must be a positive number.");
   req("paymentDate", (v) => !!Date.parse(v), "Valid payment date is required.");
