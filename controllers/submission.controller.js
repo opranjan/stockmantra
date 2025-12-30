@@ -101,4 +101,102 @@ async function submit(req, res) {
   }
 }
 
-module.exports = { uploadFields, submit };
+
+
+
+// GET all submissions (Admin Panel)
+async function getSubmissions(req, res) {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      fromDate,
+      toDate,
+    } = req.query;
+
+    const skip = (page - 1) * limit;
+
+    // 🔍 Search filter
+    const searchQuery = search
+      ? {
+          $or: [
+            { fullName: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+            { mobile: { $regex: search, $options: "i" } },
+            { pan: { $regex: search, $options: "i" } },
+            { txnId: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    // 📅 Date filter
+    const dateQuery = {};
+    if (fromDate || toDate) {
+      dateQuery.paymentDate = {};
+      if (fromDate) dateQuery.paymentDate.$gte = new Date(fromDate);
+      if (toDate) dateQuery.paymentDate.$lte = new Date(toDate);
+    }
+
+    const query = {
+      ...searchQuery,
+      ...dateQuery,
+    };
+
+    const [data, total] = await Promise.all([
+      Submission.find(query)
+        .sort({ createdAt: -1 }) // latest first
+        .skip(skip)
+        .limit(Number(limit)),
+      Submission.countDocuments(query),
+    ]);
+
+    return res.status(200).json({
+      ok: true,
+      page: Number(page),
+      limit: Number(limit),
+      total,
+      totalPages: Math.ceil(total / limit),
+      data,
+    });
+  } catch (err) {
+    console.error("❌ Get submissions error:", err);
+    return res.status(500).json({
+      ok: false,
+      message: "Failed to fetch submissions",
+    });
+  }
+}
+
+
+
+
+// GET submission by ID
+async function getSubmissionById(req, res) {
+  try {
+    const { id } = req.params;
+
+    const submission = await Submission.findById(id);
+    if (!submission) {
+      return res.status(404).json({
+        ok: false,
+        message: "Submission not found",
+      });
+    }
+
+    return res.status(200).json({
+      ok: true,
+      data: submission,
+    });
+  } catch (err) {
+    console.error("❌ Get submission error:", err);
+    return res.status(500).json({
+      ok: false,
+      message: "Failed to fetch submission",
+    });
+  }
+}
+
+
+
+module.exports = { uploadFields, submit, getSubmissions, getSubmissionById };
