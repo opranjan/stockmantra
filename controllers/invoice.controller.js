@@ -10,6 +10,47 @@ function formatDate(date) {
   });
 }
 
+
+
+function priceToWords(price) {
+  const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
+    dblDigit = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"],
+    tensPlace = ["", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+  const handle_tens = (num) => {
+    if (num < 10) return sglDigit[num];
+    else if (num < 20) return dblDigit[num - 10];
+    else return tensPlace[Math.floor(num / 10)] + (num % 10 !== 0 ? " " + sglDigit[num % 10] : "");
+  };
+
+  let remainder = Math.floor(price);
+  if (remainder === 0) return "Zero Rupees Only";
+
+  let str = "";
+  if (Math.floor(remainder / 10000000) > 0) {
+    str += handle_tens(Math.floor(remainder / 10000000)) + " Crore ";
+    remainder %= 10000000;
+  }
+  if (Math.floor(remainder / 100000) > 0) {
+    str += handle_tens(Math.floor(remainder / 100000)) + " Lakh ";
+    remainder %= 100000;
+  }
+  if (Math.floor(remainder / 1000) > 0) {
+    str += handle_tens(Math.floor(remainder / 1000)) + " Thousand ";
+    remainder %= 1000;
+  }
+  if (Math.floor(remainder / 100) > 0) {
+    str += handle_tens(Math.floor(remainder / 100)) + " Hundred ";
+    remainder %= 100;
+  }
+  if (remainder > 0) {
+    if (str !== "") str += "and ";
+    str += handle_tens(remainder);
+  }
+
+  return str.trim() + " Rupees Only";
+}
+
 async function generateInvoice(req, res) {
   try {
     const { txnId } = req.params;
@@ -24,6 +65,8 @@ async function generateInvoice(req, res) {
     const baseAmount = (total - (cgst + sgst)).toFixed(2);
     const invoiceNo = `INV-${txnId}-${Date.now()}`;
     const invoiceDate = formatDate(new Date());
+
+    const amountInWords = priceToWords(total); 
 
     // 🧾 Create document with larger margin
     const doc = new PDFDocument({ size: "A4", margin: 50 });
@@ -70,7 +113,7 @@ async function generateInvoice(req, res) {
     // GST
     doc.rect(startX, y, pageWidth, 28).stroke();
     doc.font("Helvetica-Bold").text("GST NO :", startX + pad, y + 8);
-    doc.font("Helvetica").text("46AASBD2035G1AC", startX + 90, y + 8);
+    doc.font("Helvetica").text("27ABCA9890Q1ZR", startX + 90, y + 8);
     y += 28;
 
     // ===== RECIPIENT =====
@@ -126,21 +169,21 @@ async function generateInvoice(req, res) {
     doc.rect(startX, y, pageWidth, 28).stroke();
     doc.font("Helvetica-Bold").text("Start Date", startX + pad, y + 8);
     doc.font("Helvetica").text(formatDate(submission.paymentDate), startX + 90, y + 8);
-    y += 28;
+   // y += 28;
 
     // ===== TAX SECTION =====
-    const taxBoxW = pageWidth * 0.5;
+     const taxBoxW = pageWidth * 0.5;
     doc.rect(startX + taxBoxW, y, taxBoxW, 55).stroke();
-    doc.font("Helvetica-Bold").text("CGST", startX + taxBoxW + pad, y + 10);
-    doc.text(cgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 10, {
-      width: 50,
-      align: "right",
-    });
-    doc.font("Helvetica-Bold").text("SGST", startX + taxBoxW + pad, y + 28);
-    doc.text(sgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 28, {
-      width: 50,
-      align: "right",
-    });
+    //doc.font("Helvetica-Bold").text("CGST", startX + taxBoxW + pad, y + 10);
+    // doc.text(cgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 10, {
+    //   width: 50,
+    //   align: "right",
+    // });
+    //doc.font("Helvetica-Bold").text("SGST", startX + taxBoxW + pad, y + 28);
+    // doc.text(sgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 28, {
+    //   width: 50,
+    //   align: "right",
+    // });
 
     // Total box
     doc.rect(startX + taxBoxW, y + 55, taxBoxW, 28).stroke();
@@ -151,10 +194,22 @@ async function generateInvoice(req, res) {
     });
     y += 83;
 
-    // ===== AMOUNT IN WORDS =====
+    // // ===== AMOUNT IN WORDS =====
+    // doc.rect(startX, y, pageWidth, 28).stroke();
+    // doc.font("Helvetica-Bold").text("Total Amount in Words", startX + pad, y + 8);
+    // doc.font("Helvetica").text("One Thousand Rupees only", startX + 190, y + 8);
+    // y += 28;
+
+
+
+    // ===== DYNAMIC AMOUNT IN WORDS =====
     doc.rect(startX, y, pageWidth, 28).stroke();
-    doc.font("Helvetica-Bold").text("Total Amount in Words", startX + pad, y + 8);
-    doc.font("Helvetica").text("One Thousand Rupees only", startX + 190, y + 8);
+    doc.font("Helvetica-Bold").text("Total Amount in Words:", startX + pad, y + 8);
+    // Adjusting start X for words so it doesn't overlap the label
+    doc.font("Helvetica").text(amountInWords, startX + 160, y + 8, {
+        width: pageWidth - 170,
+        align: "left"
+    });
     y += 28;
 
     // ===== IMPORTANT NOTES =====
