@@ -8,7 +8,7 @@
 // a single SMTP socket.
 
 const { Worker } = require("bullmq");
-const { QUEUE_NAMES, JOB_TYPES } = require("./index");
+const { QUEUE_NAMES, JOB_TYPES, BULL_PREFIX } = require("./index");
 const { makeBullConnection } = require("../utils/redis");
 const { handleInvoiceEmail } = require("./handlers/invoiceEmail");
 const { handleAgreementEmail } = require("./handlers/agreementEmail");
@@ -36,6 +36,7 @@ function startWorker() {
 
   worker = new Worker(QUEUE_NAMES.EMAIL, processJob, {
     connection: makeBullConnection(),
+    prefix: BULL_PREFIX,
     concurrency: CONCURRENCY,
     // Limit how many jobs we ack/process per second to avoid overwhelming SMTP.
     limiter: { max: 30, duration: 1000 },

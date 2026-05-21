@@ -3,7 +3,11 @@
 // the worker that actually drains them lives in queues/worker.js.
 
 const { Queue, QueueEvents } = require("bullmq");
-const { makeBullConnection } = require("../utils/redis");
+const { makeBullConnection, REDIS_KEY_PREFIX } = require("../utils/redis");
+
+// BullMQ default key prefix is "bull". Namespacing it under our project
+// prefix keeps multiple apps that share one Redis isolated.
+const BULL_PREFIX = `${REDIS_KEY_PREFIX}:bull`;
 
 const QUEUE_NAMES = {
   EMAIL: "email-jobs",
@@ -27,6 +31,7 @@ const DEFAULT_JOB_OPTS = {
 
 const emailQueue = new Queue(QUEUE_NAMES.EMAIL, {
   connection: makeBullConnection(),
+  prefix: BULL_PREFIX,
   defaultJobOptions: DEFAULT_JOB_OPTS,
 });
 
@@ -34,6 +39,7 @@ const emailQueue = new Queue(QUEUE_NAMES.EMAIL, {
 // being the worker itself (useful for the /api/queue-status endpoint).
 const emailQueueEvents = new QueueEvents(QUEUE_NAMES.EMAIL, {
   connection: makeBullConnection(),
+  prefix: BULL_PREFIX,
 });
 
 async function closeQueues() {
@@ -43,6 +49,7 @@ async function closeQueues() {
 module.exports = {
   QUEUE_NAMES,
   JOB_TYPES,
+  BULL_PREFIX,
   emailQueue,
   emailQueueEvents,
   closeQueues,

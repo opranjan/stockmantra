@@ -6,6 +6,11 @@
 const IORedis = require("ioredis");
 
 const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
+// All keys this project writes will be namespaced with this prefix, so it can
+// safely share a Redis instance with other apps. Pick something unique per
+// project (e.g. "stockmantra"). Combined with a dedicated DB number in
+// REDIS_URL (e.g. .../1), collisions are impossible.
+const REDIS_KEY_PREFIX = process.env.REDIS_KEY_PREFIX || "stockmantra";
 
 function makeClient(opts = {}) {
   const client = new IORedis(REDIS_URL, {
@@ -41,4 +46,10 @@ async function closeRedis() {
   }
 }
 
-module.exports = { redis, makeBullConnection, closeRedis, REDIS_URL };
+module.exports = {
+  redis,
+  makeBullConnection,
+  closeRedis,
+  REDIS_URL,
+  REDIS_KEY_PREFIX,
+};

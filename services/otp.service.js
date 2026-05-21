@@ -6,13 +6,15 @@
 //   otp:<email>          -> 6-digit code, expires in OTP_TTL_SECONDS
 //   otp:attempts:<email> -> failed verification counter, expires with the code
 
-const { redis } = require("../utils/redis");
+const { redis, REDIS_KEY_PREFIX } = require("../utils/redis");
 
 const OTP_TTL_SECONDS = parseInt(process.env.OTP_TTL_SECONDS || "300", 10); // 5 min
 const MAX_ATTEMPTS = parseInt(process.env.OTP_MAX_ATTEMPTS || "5", 10);
 
-const otpKey = (email) => `otp:${email.toLowerCase()}`;
-const attemptsKey = (email) => `otp:attempts:${email.toLowerCase()}`;
+// Project-scoped keys so we can share Redis with other apps without collisions.
+const otpKey = (email) => `${REDIS_KEY_PREFIX}:otp:${email.toLowerCase()}`;
+const attemptsKey = (email) =>
+  `${REDIS_KEY_PREFIX}:otp:attempts:${email.toLowerCase()}`;
 
 async function saveOtp(email, otp) {
   await redis

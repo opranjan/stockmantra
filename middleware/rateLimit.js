@@ -8,12 +8,14 @@
 
 const rateLimit = require("express-rate-limit");
 const RedisStore = require("rate-limit-redis").default || require("rate-limit-redis");
-const { redis } = require("../utils/redis");
+const { redis, REDIS_KEY_PREFIX } = require("../utils/redis");
 
-function makeStore(prefix) {
+// Project-scoped store prefix keeps counters isolated when sharing Redis
+// with other apps (e.g. "stockmantra:rl:global:1.2.3.4").
+function makeStore(suffix) {
   return new RedisStore({
     sendCommand: (...args) => redis.call(...args),
-    prefix,
+    prefix: `${REDIS_KEY_PREFIX}:rl:${suffix}:`,
   });
 }
 
@@ -22,7 +24,7 @@ const globalLimiter = rateLimit({
   limit: 300, // 300 req / min / IP
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  store: makeStore("rl:global:"),
+  store: makeStore("global"),
   message: { ok: false, message: "Too many requests, please slow down." },
 });
 
@@ -31,7 +33,7 @@ const submitLimiter = rateLimit({
   limit: 10, // 10 submits / min / IP
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  store: makeStore("rl:submit:"),
+  store: makeStore("submit"),
   message: { ok: false, message: "Too many submissions. Try again in a minute." },
 });
 
@@ -40,7 +42,7 @@ const otpLimiter = rateLimit({
   limit: 5, // 5 OTP requests / min / IP
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  store: makeStore("rl:otp:"),
+  store: makeStore("otp"),
   message: { ok: false, message: "Too many OTP requests. Try again in a minute." },
 });
 
