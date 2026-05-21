@@ -1,22 +1,28 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "worker": "node queues/standalone-worker.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bullmq": "^5.12.0",
     "cloudinary": "^2.8.0",
+    "compression": "^1.7.5",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.4.1",
     "fs-extra": "^11.3.2",
     "googleapis": "^165.0.0",
     "helmet": "^8.1.0",
+    "ioredis": "^5.4.1",
     "mongoose": "^8.19.3",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
@@ -24,6 +30,7 @@
     "nodemailer": "^7.0.10",
     "nodemon": "^3.1.11",
     "number-to-words": "^1.2.4",
-    "pdfkit": "^0.17.2"
+    "pdfkit": "^0.17.2",
+    "rate-limit-redis": "^4.2.0"
   }
 }

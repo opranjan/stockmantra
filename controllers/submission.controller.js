@@ -1,11 +1,19 @@
 // controllers/submission.controller.js
+// Flow:
+//   1. Validate fields + files
+//   2. Upload PAN + Aadhar to Cloudinary in parallel
+//   3. Persist the Submission to Mongo
+//   4. Enqueue invoice-email job (PDF generation + send happens in worker)
+//   5. Return 201 immediately with the saved submission
+//
+// The user no longer waits for PDF rendering or SMTP. If SMTP is down the
+// worker retries 5x with exponential backoff; the submission is still saved.
+
 const multer = require("multer");
 const Submission = require("../models/Submission");
 const { uploadToCloudinary } = require("../services/cloudinary.service");
 const { validateBody } = require("../utils/validate");
-const { sendEmail } = require("../services/email.service");
-const { welcomeEmailTemplate } = require("../templates/welcomeEmail");
-const { generateInvoiceBuffer } = require("../services/invoice.service");
+const { emailQueue, JOB_TYPES } = require("../queues");
 
 const allowedMime = new Set(["application/pdf", "image/png", "image/jpeg"]);
 
@@ -29,28 +37,24 @@ async function submit(req, res) {
     const panFile = files.panDoc?.[0];
     const aadharFile = files.aadharDoc?.[0];
 
-    // Validate input
     const errors = validateBody ? validateBody(req.body) : [];
     if (!panFile) errors.push({ field: "panDoc", message: "PAN document is required." });
     if (!aadharFile) errors.push({ field: "aadharDoc", message: "Aadhar document is required." });
     if (errors.length) return res.status(400).json({ ok: false, errors });
 
-    // Upload to Cloudinary
-    const panDocMeta = await uploadToCloudinary(
-      panFile.buffer,
-      `${Date.now()}-${req.body.pan}-PAN-${panFile.originalname}`
-    );
-    const aadharDocMeta = await uploadToCloudinary(
-      aadharFile.buffer,
-      `${Date.now()}-${req.body.pan}-AADHAR-${aadharFile.originalname}`
-    );
+    // Parallel uploads — Cloudinary is the slowest step (~1-3s per file).
+    const pan = req.body.pan.toUpperCase();
+    const stamp = Date.now();
+    const [panDocMeta, aadharDocMeta] = await Promise.all([
+      uploadToCloudinary(panFile.buffer, `${stamp}-${pan}-PAN-${panFile.originalname}`),
+      uploadToCloudinary(aadharFile.buffer, `${stamp}-${pan}-AADHAR-${aadharFile.originalname}`),
+    ]);
 
-    // Save submission
     const submission = await Submission.create({
       fullName: req.body.fullName,
       email: req.body.email,
       mobile: req.body.mobile,
-      pan: req.body.pan.toUpperCase(),
+      pan,
       dob: req.body.dob,
       amount: parseFloat(req.body.amount),
       paymentDate: req.body.paymentDate,
@@ -60,40 +64,20 @@ async function submit(req, res) {
       aadharDoc: aadharDocMeta,
     });
 
-    // Generate invoice PDF in memory
-    const pdfBuffer = await generateInvoiceBuffer(submission);
-
-    // Calculate subscription period (2 days sample)
-    const startDate = new Date(submission.paymentDate);
-    const endDate = new Date(startDate.getTime() + 2 * 86400000);
-    const formattedStart = startDate.toLocaleDateString("en-IN");
-    const formattedEnd = endDate.toLocaleDateString("en-IN");
-
-    // Generate HTML email
-    const emailHtml = welcomeEmailTemplate({
-      name: submission.fullName,
-      email: submission.email,         // ✅ added email
-      mobile: submission.mobile,   
-      amount: submission.amount,
-      startDate: formattedStart,
-      // endDate: formattedEnd,
-      invoiceNo: `INV-${submission.txnId}`,
-    });
-
-    // Send via Hostinger SMTP
-    await sendEmail({
-      to: submission.email,
-      cc: process.env.EMAIL_CC,
-      subject: "Welcome Onboard – Your Research Service Details & Disclosures",
-      html: emailHtml,
-      attachment: pdfBuffer,
-      filename: `Invoice_${submission.txnId}.pdf`,
-    });
+    // Enqueue email — keep payload small (just the ID).
+    // jobId based on txnId so duplicate submits don't double-send.
+    // BullMQ forbids ':' in custom IDs, so use '-' as separator.
+    const job = await emailQueue.add(
+      JOB_TYPES.INVOICE_EMAIL,
+      { submissionId: submission._id.toString() },
+      { jobId: `invoice-${submission.txnId}` }
+    );
 
     return res.status(201).json({
       ok: true,
-      message: "Submission saved and email sent with invoice.",
+      message: "Submission saved. Invoice email is being sent.",
       data: submission,
+      jobId: job.id,
     });
   } catch (err) {
     console.error("❌ Submit error:", err);
@@ -101,23 +85,12 @@ async function submit(req, res) {
   }
 }
 
-
-
-
-// GET all submissions (Admin Panel)
+// GET all submissions (Admin Panel) — lean() avoids hydration overhead.
 async function getSubmissions(req, res) {
   try {
-    const {
-      page = 1,
-      limit = 10,
-      search = "",
-      fromDate,
-      toDate,
-    } = req.query;
+    const { page = 1, limit = 10, search = "", fromDate, toDate } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
 
-    const skip = (page - 1) * limit;
-
-    // 🔍 Search filter
     const searchQuery = search
       ? {
           $or: [
@@ -130,7 +103,6 @@ async function getSubmissions(req, res) {
         }
       : {};
 
-    // 📅 Date filter
     const dateQuery = {};
     if (fromDate || toDate) {
       dateQuery.paymentDate = {};
@@ -138,16 +110,14 @@ async function getSubmissions(req, res) {
       if (toDate) dateQuery.paymentDate.$lte = new Date(toDate);
     }
 
-    const query = {
-      ...searchQuery,
-      ...dateQuery,
-    };
+    const query = { ...searchQuery, ...dateQuery };
 
     const [data, total] = await Promise.all([
       Submission.find(query)
-        .sort({ createdAt: -1 }) // latest first
+        .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(Number(limit)),
+        .limit(Number(limit))
+        .lean(),
       Submission.countDocuments(query),
     ]);
 
@@ -156,47 +126,26 @@ async function getSubmissions(req, res) {
       page: Number(page),
       limit: Number(limit),
       total,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(total / Number(limit)),
       data,
     });
   } catch (err) {
     console.error("❌ Get submissions error:", err);
-    return res.status(500).json({
-      ok: false,
-      message: "Failed to fetch submissions",
-    });
+    return res.status(500).json({ ok: false, message: "Failed to fetch submissions" });
   }
 }
 
-
-
-
-// GET submission by ID
 async function getSubmissionById(req, res) {
   try {
-    const { id } = req.params;
-
-    const submission = await Submission.findById(id);
+    const submission = await Submission.findById(req.params.id).lean();
     if (!submission) {
-      return res.status(404).json({
-        ok: false,
-        message: "Submission not found",
-      });
+      return res.status(404).json({ ok: false, message: "Submission not found" });
     }
-
-    return res.status(200).json({
-      ok: true,
-      data: submission,
-    });
+    return res.status(200).json({ ok: true, data: submission });
   } catch (err) {
     console.error("❌ Get submission error:", err);
-    return res.status(500).json({
-      ok: false,
-      message: "Failed to fetch submission",
-    });
+    return res.status(500).json({ ok: false, message: "Failed to fetch submission" });
   }
 }
-
-
 
 module.exports = { uploadFields, submit, getSubmissions, getSubmissionById };
