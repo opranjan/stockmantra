@@ -17,15 +17,28 @@ const submissionSchema = new mongoose.Schema(
     fullName: { type: String, required: true },
     email: { type: String, required: true },
     mobile: { type: String, required: true },
-    pan: { type: String, required: true },
-    dob: { type: String, required: true },
-    amount: { type: Number, required: true },
-    paymentDate: { type: String, required: true },
-    txnId: { type: String, required: true },
-    agentName: { type: String, required: true },
+    // Non-KYC fields are optional so the agreement-only "submitandpay" flow
+    // can persist a row with just name/email/mobile + signature.
+    pan: { type: String, required: false },
+    dob: { type: String, required: false },
+    amount: { type: Number, required: false },
+    paymentDate: { type: String, required: false },
+    txnId: { type: String, required: false },
+    agentName: { type: String, required: false },
 
-    panDoc: { type: cloudinaryFileSchema, required: true },
-    aadharDoc: { type: cloudinaryFileSchema, required: true },
+    panDoc: { type: cloudinaryFileSchema, required: false },
+    aadharDoc: { type: cloudinaryFileSchema, required: false },
+
+    // Agreement + e-sign metadata (populated by submitWithAgreement)
+    agreementAccepted: { type: Boolean, default: false },
+    agreementAcceptedAt: { type: Date },
+    agreementIp: { type: String },
+    signature: { type: String },
+    location: { type: String },
+
+    // Soft-delete — indexed because most reads filter on it.
+    isDeleted: { type: Boolean, default: false, index: true },
+    deletedAt: { type: Date, default: null },
 
     createdAt: { type: Date, default: Date.now },
   },

@@ -26,7 +26,11 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
     const leftMargin = 60;
     const width = 480;
     const agreementDate = formatDate(new Date());
-    const { fullName, email, mobile } = submission;
+    const { fullName, email, mobile, location } = submission;
+    // Prefer the IP captured when the client actually signed (stored on the
+    // submission). The `ipAddress` argument reflects whoever triggered this
+    // email job, which on a resend is not the signer.
+    const signerIp = submission.agreementIp || ipAddress;
 
     // ================= HEADER (only first page) =================
     const headerHeight = 100;
@@ -82,22 +86,23 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
 
     // ================= PAGE 1 =================
     heading("TERMS AND CONDITIONS:");
-    doc.font(regular).fillColor(gray).fontSize(normal).text(
-      "Parties to these Terms and Conditions:\n\n" +
-      "i. Research Analyst: ALDERLEAF STOCKMANTRA Pvt Ltd., a SEBI Registered Research Analyst (INH000019099), with its registered office at Renuka Shobha FI 604 Sno., Chinchwad, Pune, Maharashtra.\n\n" +
-      "ii. Client: The individual subscribing to or availing research services provided by the Research Analyst, hereinafter referred to as the 'Client'.",
-      leftMargin, doc.y, { width, align: "justify", lineGap: 2 }
-    );
+   doc.font(regular).fillColor(gray).fontSize(normal).text(
+  "Parties to these Terms and Conditions:\n\n" +
+  "i. Research Analyst: Alderleaf Stockmantra Private Limited, a SEBI Registered Research Analyst, holding Registration No. INH000019099, with its registered office located at Flat No. A-304, Sonigara Laurel, Sr. No. 257, Near Mankar Chowk, Wakad, Pune, Maharashtra - 411057, hereinafter referred to as the 'Research Analyst' or 'RA'.\n\n" +
+  "ii. Client: The individual or entity subscribing to or availing research services provided by the Research Analyst, hereinafter referred to as the 'Client'.",
+  leftMargin,
+  doc.y,
+  { width, align: "justify", lineGap: 4 }
+);
 
-    section(
-      "1. Availing The Services:",
-      "The Client hereby accepts the research services and confirms to avail the same at their discretion. The Research Analyst agrees to provide such services in accordance with SEBI (Research Analyst) Regulations, 2014."
-    );
-
-    section(
-      "2. Obligations on RA and Client:",
-      "Both the Client and RA shall comply with all applicable SEBI regulations, circulars, and amendments issued from time to time."
-    );
+ section(
+  "1. Availing The Services:",
+  "The Client hereby accepts the research services and confirms to avail the research services on its own discretion provided by the Research Analyst ('RA').\n\nThe Part-time Research Analyst agrees to provide such services in accordance with the terms and conditions set forth underneath."
+);
+  section(
+  "2. Obligations on RA and Client:",
+  "The Client and the Part-time Research Analyst shall be bound by all applicable regulations, rules, circulars, and amendments issued by SEBI, including the SEBI (Research Analysts) Regulations, 2014, and all other notifications issued by the Government, if any, from time to time."
+);
 
     addFooter();
 
@@ -108,29 +113,31 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
 // doc.addPage();
 
 section(
-  "3. Client Information and KYC:",
-  "The client is bound, upon acceptance of services, to submit all requisite documents as requested by the research analyst and help the RA to complete the KYC process. " +
-  "The client hereby gives consent to the research analyst to fetch his KYC documents from the KYC Registration Agency (KRA)."
+"3. Client Information and KYC:",
+"The Client is bound, upon acceptance of services, to submit all requisite documents as requested by the Research Analyst and assist the RA in completing the KYC process. The Client hereby gives consent to the Research Analyst to fetch his/her KYC documents from the KYC Registration Agency (KRA)."
 );
 
+
 section(
-  "4. Standard Terms of Service:",
-  "The Client acknowledges and gives his consent to be bound by the terms set forth herewith, as well as any applicable amendments or updates provided by the Research Analyst.\n\n" +
-  "The client hereby agrees:\n" +
-  "1. I have read and understood the terms and conditions applicable to a research analyst as defined under regulation 2(1)(u) of the SEBI (Research Analyst) Regulations, 2014, including the fee structure.\n" +
-  "2. I am subscribing to the research services for my own benefit and consumption, and any reliance placed on the research report provided by the Research Analyst shall be based on my own judgment and assessment of the conclusions contained in the research report.\n\n" +
-  "I understand that:\n" +
-  "i. Any investment made based on the recommendations in the research report is subject to market risk.\n" +
-  "ii. Recommendations in the research report do not provide any assurance of returns.\n" +
-  "iii. There is no recourse to claim any losses incurred on investments made based on the recommendations in the research report.\n\n" +
-  "Declaration by Research Analyst:\n" +
-  "1. It is duly registered with SEBI as an RA having Registration No.: INH000019099, Date of Registration: Mar 19, 2024.\n" +
-  "2. It has registration and qualifications required to render the services contemplated under the RA Regulations, and the same are valid and subsisting.\n" +
-  "3. The services provided by the RA do not conflict with or violate any provision of law, rule, regulation, contract, or other instrument to which it is a party or to which any of its property is or may be subject.\n" +
-  "4. The maximum fee that may be charged by the RA is Rs.1.51 lakhs per annum per family of clients.\n" +
-  "5. The recommendations provided by the RA do not provide any assurance of returns.\n" +
-  "6. The RA is not engaged in any additional professional or business activities on a full-time or executive capacity that may interfere with or influence the independence of the research report and/or recommendations."
+"4. Standard Terms of Service:",
+"The Client acknowledges and gives his consent to be bound by the terms set forth herewith, as well as any applicable amendments or updates provided by the Research Analyst.\n\n" +
+"The Client hereby agrees:\n\n" +
+"1. I have read and understood the terms and conditions applicable to a Research Analyst as defined under Regulation 2(1)(u) of the SEBI (Research Analyst) Regulations, 2014, including the fee structure.\n\n" +
+"2. I am subscribing to the research services for my own benefit and consumption, and any reliance placed on the research report provided by the Research Analyst shall be based on my own judgment and assessment of the conclusions contained in the research report.\n\n" +
+"I understand that:\n\n" +
+"i. Any investment made based on the recommendations in the research report is subject to market risk.\n\n" +
+"ii. Recommendations in the research report do not provide any assurance of returns.\n\n" +
+"iii. There is no recourse to claim any losses incurred on investments made based on the recommendations in the research report.\n\n" +
+"Declaration by Research Analyst:\n\n" +
+"The Research Analyst further declares that:\n\n" +
+"1. It is duly registered with SEBI as a Research Analyst having Registration No. INH000019099, Date of Registration: December 16, 2024.\n\n" +
+"2. It has the registration and qualifications required to render the services contemplated under the RA Regulations, and the same are valid and subsisting.\n\n" +
+"3. The services provided by the RA do not conflict with or violate any provision of law, rule, regulation, contract, or other instrument to which it is a party or to which any of its property is or may be subject.\n\n" +
+"4. The maximum fee that may be charged by the RA is ₹1.51 lakhs per annum per family of clients.\n\n" +
+"5. The recommendations provided by the RA do not provide any assurance of returns.\n\n" +
+"6. The RA is not engaged in any additional professional or business activities on a full-time or executive capacity that may interfere with or influence the independence of the research report and/or recommendations."
 );
+
 
 section(
   "5. Consideration and Mode of Payment:",
@@ -178,7 +185,7 @@ section(
   "The client is required to follow the following procedure for any grievance:\n\n" +
   "Step 1: The client should first contact the RA at the contact details mentioned below:\n" +
   "Contact No.: 7977117177\n" +
-  "Mail ID: support@alstockmantra.in\n\n" +
+  "Mail ID:saditya21p@gmail.com \n\n" +
   "Step 2: In case, if the client is unsatisfied, he can lodge a complaint with the SEBI through SEBI's SCORES platform at www.scores.sebi.gov.in.\n" +
   "Step 3: The client can also consider to seek resolution through the Online Dispute Resolution (ODR) mechanism through SMART ODR Portal: https://smartodr.in.\n\n" +
   "DISCLAIMER: The client is strictly required to follow the procedure as mentioned above, otherwise the RA shall not be liable delay in resolution of the grievance.\n\n" +
@@ -210,7 +217,7 @@ section(
   "10. For any grievances:\n" +
   "Step 1: The client should first contact the RA using the details mentioned herewith:\n" +
   "Contact No.: 7977117177\n" +
-  "Mail ID: support@alstockmantra.in\n" +
+  "Mail ID: saditya21p@gmail.com \n" +
   "Step 2: If the resolution is unsatisfactory, the client can also lodge grievances through SEBI's SCORES platform at www.scores.sebi.gov.in\n" +
   "Step 3: The client may also consider the Online Dispute Resolution (ODR) through the Smart ODR portal at https://smartodr.in\n\n" +
   "11. Clients are required to keep contact details, including email id and mobile number/s updated with the RA at all times.\n\n" +
@@ -258,7 +265,7 @@ section(
     // doc.addPage();
     heading("CONSENT & ACCEPTANCE:");
     const consentTop = doc.y + 20;
-    doc.rect(leftMargin, consentTop, width, 200).stroke();
+    doc.rect(leftMargin, consentTop, width, 290).stroke();
     doc.font(regular).fillColor(gray)
       .text(`I, ${fullName}, acknowledge that I have read and agree to the complete Terms & Conditions set forth by ALDERLEAF STOCKMANTRA Pvt Ltd as of ${agreementDate}.`,
         leftMargin + 10, consentTop + 10, { width: width - 20, align: "justify" });
@@ -268,7 +275,28 @@ section(
       .text(`Name: ${fullName}`, leftMargin+10)
       .text(`Email: ${email}, `,  leftMargin+10)
       .text(`Signed at: ${agreementDate}`,  leftMargin+10)
-      .text(`IP Address: ${ipAddress || "Not Captured"}`,  leftMargin+10);
+      .text(`IP Address: ${signerIp || "Not Captured"}`,  leftMargin+10)
+      .text(`Location: ${location || "Not Captured"}`,  leftMargin+10);
+
+    // Render the captured signature image just below the signed details.
+    // It is stored as a base64 data URL (e.g. "data:image/png;base64,...");
+    // strip the prefix and convert to a Buffer for PDFKit. Guard against
+    // missing/invalid data so a bad signature can't crash PDF generation.
+    if (submission.signature) {
+      try {
+        const base64 = submission.signature.includes(",")
+          ? submission.signature.split(",")[1]
+          : submission.signature;
+        const sigBuffer = Buffer.from(base64, "base64");
+        doc.moveDown(0.6);
+        doc.font(bold).fillColor(gray).text("Signature:", leftMargin + 10);
+        const sigY = doc.y + 2;
+        doc.image(sigBuffer, leftMargin + 10, sigY, { fit: [160, 60] });
+        doc.y = sigY + 64; // advance past the image so following text doesn't overlap
+      } catch (err) {
+        console.error("⚠️ Failed to render signature image:", err.message);
+      }
+    }
 
     doc.moveDown(2);
     doc.fontSize(9).fillColor(lightGray)
