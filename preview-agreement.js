@@ -8,9 +8,9 @@ const { generateUserAgreementBuffer } = require("./services/agreement.service");
     console.log("⏳ Generating Agreement PDF preview...");
 
     const fakeSubmission = {
-      fullName: "Akash Kumar",
-      email: "akash@example.com",
-      mobile: "9876543210",
+      fullName: "Soyab ",
+      email: "soyabgigani@gmail.com",
+      mobile: "9974336049",
     };
 
     const ip = "103.224.67.12"; // fake IP
