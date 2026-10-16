@@ -47,7 +47,7 @@ app.use(compression());
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
 // JSON limit: enough for any non-upload route. File uploads go through multer,
-// which has its own 5MB limit per file.
+// which has its own 50MB limit per file.
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
@@ -65,7 +65,7 @@ app.use("/api", queueRoutes);
 app.use((err, _req, res, _next) => {
   if (err?.name === "MulterError") {
     if (err.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({ ok: false, message: "File too large (max 5MB)." });
+      return res.status(400).json({ ok: false, message: "File too large (max 50MB)." });
     }
     if (err.code === "LIMIT_UNEXPECTED_FILE") {
       return res.status(400).json({

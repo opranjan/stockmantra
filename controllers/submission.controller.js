@@ -19,7 +19,7 @@ const allowedMime = new Set(["application/pdf", "image/png", "image/jpeg"]);
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (allowedMime.has(file.mimetype)) cb(null, true);
     else cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", "Invalid file type."));
